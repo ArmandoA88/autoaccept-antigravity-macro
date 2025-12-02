@@ -38,6 +38,19 @@ To **STOP** the macro:
 
 ---
 
+## ⚡ Auto-Start on Windows Boot
+Want the macro to start automatically when you turn on your computer?
+
+1.  **Open Startup Folder**:
+    *   Press `Win + R` on your keyboard.
+    *   Type `shell:startup` and press **Enter**.
+2.  **Create Shortcut**:
+    *   **Option A (Silent - Recommended)**: Right-click `run_silent.vbs` in this folder -> **Create shortcut**. Drag the shortcut into the Startup folder. This runs in the background with no window.
+    *   **Option B (Visible)**: Right-click `run_macro.bat` -> **Create shortcut**. Drag it into the Startup folder. This keeps a terminal window open.
+3.  **Done!** The macro will now launch every time you log in.
+
+---
+
 ## 🔄 Recent Updates
 - **v1.1**: Added **Auto-Scroll**. If `accept.png` is not found, the script looks for `anchor.png` and scrolls down 1000px to reveal hidden buttons.
 
