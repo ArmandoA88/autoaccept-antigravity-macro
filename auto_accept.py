@@ -46,11 +46,48 @@ def main():
                 
                 if location:
                     print(f"[{time.strftime('%H:%M:%S')}] Button found at {location}. Clicking...")
+                    
+                    # Save current mouse position
+                    current_mouse_x, current_mouse_y = pyautogui.position()
+                    
                     center = pyautogui.center(location)
                     pyautogui.click(center)
+                    
+                    # Restore mouse position
+                    pyautogui.moveTo(current_mouse_x, current_mouse_y)
+                    
                     last_location = location
                     time.sleep(2) 
                 else:
+                    # Button not found. Check for anchor to scroll down.
+                    anchor_filename = 'anchor.png'
+                    if os.path.exists(anchor_filename):
+                        try:
+                            anchor_loc = pyautogui.locateOnScreen(anchor_filename, confidence=0.75, grayscale=False)
+                            if anchor_loc:
+                                print(f"[{time.strftime('%H:%M:%S')}] Anchor found. Scrolling down...")
+                                # Move mouse below the anchor (header) to ensure we are over the content
+                                target_x = anchor_loc.left + (anchor_loc.width // 2)
+                                target_y = anchor_loc.top + anchor_loc.height + 100 # 100px below anchor
+                                
+                                # Save current mouse position
+                                current_mouse_x, current_mouse_y = pyautogui.position()
+                                
+                                pyautogui.moveTo(target_x, target_y)
+                                pyautogui.scroll(-1000) # Scroll down more (negative is down on Windows)
+                                
+                                # Restore mouse position to be less intrusive? 
+                                # User might prefer the mouse stays there if they are not using it.
+                                # But if they are using it, this is annoying. 
+                                # Let's restore it.
+                                pyautogui.moveTo(current_mouse_x, current_mouse_y)
+                                
+                                time.sleep(1) # Wait a bit after scrolling before searching again
+                        except pyautogui.ImageNotFoundException:
+                            pass
+                        except Exception as e:
+                            print(f"Scroll error: {e}")
+
                     time.sleep(0.5)
 
             except pyautogui.ImageNotFoundException:
