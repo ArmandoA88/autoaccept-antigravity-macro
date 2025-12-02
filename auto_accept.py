@@ -21,29 +21,39 @@ def main():
 
     print(f"Looking for {image_filename}...")
 
+    last_location = None
+
     try:
         while True:
             try:
-                # Locate the button on the screen
-                # confidence=0.9 requires opencv-python to be installed
-                # We use a high confidence to avoid false positives
-                location = pyautogui.locateOnScreen(image_filename, confidence=0.8, grayscale=False)
+                location = None
+                
+                # 1. OPTIMIZATION: Smart Search
+                if last_location:
+                    x, y, w, h = last_location
+                    region = (max(0, x - 50), max(0, y - 50), w + 100, h + 100)
+                    try:
+                        location = pyautogui.locateOnScreen(image_filename, region=region, confidence=0.7, grayscale=True)
+                    except pyautogui.ImageNotFoundException:
+                        pass 
+
+                # 2. Full Screen Search
+                if not location:
+                    location = pyautogui.locateOnScreen(image_filename, confidence=0.7, grayscale=True)
                 
                 if location:
-                    print(f"Button found at {location}. Clicking...")
+                    print(f"[{time.strftime('%H:%M:%S')}] Button found at {location}. Clicking...")
                     center = pyautogui.center(location)
                     pyautogui.click(center)
-                    # Move mouse back to original position? No, that might be annoying.
-                    # Just sleep to allow the UI to update.
+                    last_location = location
                     time.sleep(2) 
                 else:
-                    # Sleep briefly to save CPU
                     time.sleep(0.5)
+
             except pyautogui.ImageNotFoundException:
-                # This exception is raised if the image is not found (in newer versions)
                 time.sleep(0.5)
             except Exception as e:
-                # print(f"Scanning... ({e})") # Debug
+                print(f"Scanning error: {e}")
                 time.sleep(0.5)
                 
     except KeyboardInterrupt:
