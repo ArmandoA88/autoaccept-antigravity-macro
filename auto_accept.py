@@ -33,13 +33,16 @@ def main():
                     x, y, w, h = last_location
                     region = (max(0, x - 50), max(0, y - 50), w + 100, h + 100)
                     try:
-                        location = pyautogui.locateOnScreen(image_filename, region=region, confidence=0.7, grayscale=True)
+                        # Increased confidence to 0.9 and enabled color matching (grayscale=False)
+                        # This prevents clicking "Main" or "Commit" buttons which look similar in shape but different in color/text
+                        location = pyautogui.locateOnScreen(image_filename, region=region, confidence=0.75, grayscale=False)
                     except pyautogui.ImageNotFoundException:
                         pass 
 
                 # 2. Full Screen Search
                 if not location:
-                    location = pyautogui.locateOnScreen(image_filename, confidence=0.7, grayscale=True)
+                    # High confidence + Color matching is crucial to avoid false positives
+                    location = pyautogui.locateOnScreen(image_filename, confidence=0.75, grayscale=False)
                 
                 if location:
                     print(f"[{time.strftime('%H:%M:%S')}] Button found at {location}. Clicking...")
