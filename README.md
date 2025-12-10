@@ -1,61 +1,57 @@
 # 🚀 Antigravity Auto-Accept Macro
 
-This tool automates the process of clicking the "Accept" button in Antigravity terminal prompts, saving you from repetitive clicking. It now includes smart auto-scrolling to find buttons that are off-screen.
+This tool automates the process of clicking the "Accept" button in Antigravity terminal prompts. It runs quietly in the background and watches for the "Accept" prompt to appear on your screen.
+
+## ✨ Features
+- **Auto-Install**: Automatically installs all required Python libraries.
+- **Smart Detection**: Uses advanced recognition to find the button even if it moved slightly.
+- **Fail-Safe**: Move your mouse to the **top-left corner** of the screen to instantly kill the program.
+- **Auto-Scroll**: Scrolls down if the button is hidden off-screen (requires `anchor.png`).
 
 ---
 
-## 📋 Features
-- **Auto-Click**: Instantly detects and clicks the "Accept" button.
-- **Smart Scroll**: Automatically scrolls down if the button is hidden (requires `anchor.png`).
-- **Fail-Safe**: Move your mouse to the top-left corner of the screen to instantly stop the script.
+## 🛠️ Quick Setup (First Time Only)
+
+1.  **Double-click `run_setup.bat`**.
+    - This will install any missing files for you.
+    - It will guide you to capture the "Accept" button image.
+    - *Follow the on-screen instructions!*
+
+2.  *(Optional)* **Auto-Start on Login**:
+    - **Double-click `add_to_startup.bat`**.
+    - This will automatically create a shortcut so the macro runs every time you start your computer.
 
 ---
 
-## 🛠️ Setup Guide
+## ▶️ Common Usage
 
-### 1. Essential: The Button Image
-The script needs to know what to look for.
-1.  Wait for an Antigravity prompt to appear.
-2.  Use **Snipping Tool** (`Win+Shift+S`) to capture **ONLY** the "Accept" button.
-3.  Save it as `accept.png` in this folder.
-    *   *Tip: Crop it tightly around the text/button edges. Avoid including the changing background.*
+### Start the Macro
+Double-click **`run_macro.bat`**.
+- A black window will appear showing "Looking for accept.png...".
+- **Leave this window open** (you can minimize it).
 
-### 2. Optional: Auto-Scroll (New!)
-If the "Accept" button is often hidden at the bottom of the list:
-1.  Take a screenshot of a **static** part of the window header (e.g., the "Antigravity" title bar or a top icon).
-2.  Save it as `anchor.png` in this folder.
-3.  The script will now detect this header and scroll down automatically when it can't find the button.
+### Stop the Macro
+- Click inside the black window and press `Ctrl+C`.
+- OR slam your mouse cursor into the **top-left corner** of your screen.
 
 ---
 
-## ▶️ How to Run
-- **Double-click** `run_macro.bat` to start.
-- **OR** run via terminal: `python auto_accept.py`
+## ❓ Troubleshooting
 
-To **STOP** the macro:
-- Press `Ctrl+C` in the terminal window.
-- **OR** slam your mouse cursor into the **top-left corner** of your screen.
+**"The window opens and closes immediately"**
+- We fixed this! The new script stays open and tells you exactly what went wrong. Read the error message in the window.
 
----
+**"It says Python is not recognized"**
+- You need to install Python. Download it from python.org and check the box **"Add Python to PATH"** during installation.
 
-## ⚡ Auto-Start on Windows Boot
-Want the macro to start automatically when you turn on your computer?
-
-1.  **Open Startup Folder**:
-    *   Press `Win + R` on your keyboard.
-    *   Type `shell:startup` and press **Enter**.
-2.  **Create Shortcut**:
-    *   **Option A (Silent - Recommended)**: Right-click `run_silent.vbs` in this folder -> **Create shortcut**. Drag the shortcut into the Startup folder. This runs in the background with no window.
-    *   **Option B (Visible)**: Right-click `run_macro.bat` -> **Create shortcut**. Drag it into the Startup folder. This keeps a terminal window open.
-3.  **Done!** The macro will now launch every time you log in.
+**"It's not clicking the button"**
+- Your `accept.png` might be outdated or low quality.
+- Run `run_setup.bat` again to capture a fresh image.
+- Ensure the image is a **small, tight crop** of just the button text and color.
 
 ---
 
-## 🔄 Recent Updates
-- **v1.1**: Added **Auto-Scroll**. If `accept.png` is not found, the script looks for `anchor.png` and scrolls down 1000px to reveal hidden buttons.
-
----
-
-## 💡 Troubleshooting
-- **Not clicking?** Try taking a new screenshot of `accept.png`. Ensure your screen scaling hasn't changed.
-- **Not scrolling?** Ensure `anchor.png` is visible on screen and matches the current window header.
+## 📂 Advanced Helper Files
+- `auto_accept.py`: The main brain of the operation.
+- `run_silent.vbs`: Run this if you want the macro to be **invisible** (no black window).
+- `requirements.txt`: List of technical dependencies.
