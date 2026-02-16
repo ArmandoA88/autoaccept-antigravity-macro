@@ -13,11 +13,16 @@ This tool automates the process of clicking the "Accept" button in Antigravity t
 
 ## 🛠️ Setup Guide
 
-### 1. Essential: The Button Image
-The script needs to know what to look for.
-1.  Wait for an Antigravity prompt to appear.
-2.  Use **Snipping Tool** (`Win+Shift+S`) to capture **ONLY** the "Accept" button.
-3.  Save it as `accept.png` in this folder.
+### 1. Essential: The Button Images
+The script needs to know what to look for. It can search for **Accept** and/or **Run** buttons.
+
+1.  **For Auto-Accept**: Save the "Accept" button screenshot as `accept.png`.
+2.  **For Auto-Run**: Save the "Run Alt+Enter" button screenshot as `run.png`.
+
+**How to capture:**
+1.  Wait for the button to appear.
+2.  Use **Snipping Tool** (`Win+Shift+S`) to capture **ONLY** the button.
+3.  Save it in this folder with the correct name.
     *   *Tip: Crop it tightly around the text/button edges. Avoid including the changing background.*
 
 ### 2. Optional: Auto-Scroll (New!)

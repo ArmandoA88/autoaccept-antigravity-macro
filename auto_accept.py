@@ -10,16 +10,22 @@ def main():
     print("Auto-accept macro started.")
     print("Press Ctrl+C to stop in the terminal, or move mouse to upper-left corner.")
     
-    image_filename = 'accept.png'
+    # List of images to search for
+    target_images = ['accept.png', 'run.png']
     
-    if not os.path.exists(image_filename):
-        print(f"Error: '{image_filename}' not found in the current directory.")
-        print("Please take a screenshot of the 'Accept' button and save it as 'accept.png'.")
-        print("Make sure to crop it tightly around the button.")
+    # Check if at least one image exists
+    existing_images = [img for img in target_images if os.path.exists(img)]
+    if not existing_images:
+        print(f"Error: No target images found (looked for {target_images}).")
+        print("Please save 'accept.png' and/or 'run.png' in this folder.")
+        # Instructions for the user
+        print("\nTo fix this:")
+        print("1. Take a screenshot of the button you want to auto-click.")
+        print("2. Save it as 'accept.png' or 'run.png' in this folder.")
         input("Press Enter to exit...")
         return
 
-    print(f"Looking for {image_filename}...")
+    print(f"Looking for: {', '.join(existing_images)}...")
 
     last_location = None
 
@@ -27,25 +33,35 @@ def main():
         while True:
             try:
                 location = None
+                found_image = None
                 
-                # 1. OPTIMIZATION: Smart Search
+                # 1. OPTIMIZATION: Smart Search (Check last known location first)
                 if last_location:
                     x, y, w, h = last_location
                     region = (max(0, x - 50), max(0, y - 50), w + 100, h + 100)
                     try:
-                        # Increased confidence to 0.9 and enabled color matching (grayscale=False)
-                        # This prevents clicking "Main" or "Commit" buttons which look similar in shape but different in color/text
-                        location = pyautogui.locateOnScreen(image_filename, region=region, confidence=0.75, grayscale=False)
+                        for img_name in existing_images:
+                            location = pyautogui.locateOnScreen(img_name, region=region, confidence=0.75, grayscale=False)
+                            if location:
+                                found_image = img_name
+                                break
                     except pyautogui.ImageNotFoundException:
                         pass 
-
+                
                 # 2. Full Screen Search
                 if not location:
-                    # High confidence + Color matching is crucial to avoid false positives
-                    location = pyautogui.locateOnScreen(image_filename, confidence=0.75, grayscale=False)
+                    for img_name in existing_images:
+                        try:
+                            # High confidence + Color matching is crucial to avoid false positives
+                            location = pyautogui.locateOnScreen(img_name, confidence=0.75, grayscale=False)
+                            if location:
+                                found_image = img_name
+                                break
+                        except pyautogui.ImageNotFoundException:
+                            pass
                 
                 if location:
-                    print(f"[{time.strftime('%H:%M:%S')}] Button found at {location}. Clicking...")
+                    print(f"[{time.strftime('%H:%M:%S')}] Found '{found_image}' at {location}. Clicking...")
                     
                     # Save current mouse position
                     current_mouse_x, current_mouse_y = pyautogui.position()
@@ -76,10 +92,7 @@ def main():
                                 pyautogui.moveTo(target_x, target_y)
                                 pyautogui.scroll(-1000) # Scroll down more (negative is down on Windows)
                                 
-                                # Restore mouse position to be less intrusive? 
-                                # User might prefer the mouse stays there if they are not using it.
-                                # But if they are using it, this is annoying. 
-                                # Let's restore it.
+                                # Restore mouse position
                                 pyautogui.moveTo(current_mouse_x, current_mouse_y)
                                 
                                 time.sleep(1) # Wait a bit after scrolling before searching again
