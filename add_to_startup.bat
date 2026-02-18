@@ -1,20 +1,29 @@
 @echo off
 cd /d "%~dp0"
-set "SCRIPT_PATH=%~dp0run_macro.bat"
-set "SHORTCUT_PATH=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\AutoAcceptMacro.lnk"
 
+:: 1. Generate run_silent.vbs with dynamic path
+set "VBS_PATH=%~dp0run_silent.vbs"
+set "BAT_PATH=%~dp0run_macro.bat"
+
+echo Creating run_silent.vbs...
+> "%VBS_PATH%" echo Set WshShell = CreateObject("WScript.Shell")
+>> "%VBS_PATH%" echo WshShell.Run chr(34) ^& "%BAT_PATH%" ^& chr(34), 0
+>> "%VBS_PATH%" echo Set WshShell = Nothing
+
+:: 2. Create Shortcut to run_silent.vbs in Startup folder
+set "STARTUP_DIR=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"
+set "SHORTCUT_PATH=%STARTUP_DIR%\AutoAcceptMacro.lnk"
+
+echo.
 echo --- Add to Startup ---
-echo This will make the macro run automatically when you log in.
-echo.
-echo Target File: %SCRIPT_PATH%
-echo Startup Folder: %APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup
+echo This will make the macro run silently in the background when you log in.
 echo.
 
-powershell "$s=(New-Object -COM WScript.Shell).CreateShortcut('%SHORTCUT_PATH%');$s.TargetPath='%SCRIPT_PATH%';$s.WorkingDirectory='%~dp0';$s.Save()"
+powershell -NoProfile -Command "$s=(New-Object -COM WScript.Shell).CreateShortcut(\"%SHORTCUT_PATH%\");$s.TargetPath=\"%VBS_PATH%\";$s.WorkingDirectory=\"%~dp0\";$s.Save()"
 
 if exist "%SHORTCUT_PATH%" (
     echo [SUCCESS] Shortcut created successfully.
-    echo The macro will now start automatically when you restart your computer.
+    echo The macro will now start automatically when you restart.
 ) else (
     echo [ERROR] Failed to create shortcut.
 )

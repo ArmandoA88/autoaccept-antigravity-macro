@@ -11,13 +11,13 @@ def main():
     print("Press Ctrl+C to stop in the terminal, or move mouse to upper-left corner.")
     
     # List of images to search for
-    target_images = ['accept.png', 'run.png']
+    target_images = ['accept.png', 'run.png', 'submit.png']
     
     # Check if at least one image exists
     existing_images = [img for img in target_images if os.path.exists(img)]
     if not existing_images:
         print(f"Error: No target images found (looked for {target_images}).")
-        print("Please save 'accept.png' and/or 'run.png' in this folder.")
+        print("Please save 'accept.png', 'run.png', and/or 'submit.png' in this folder.")
         # Instructions for the user
         print("\nTo fix this:")
         print("1. Take a screenshot of the button you want to auto-click.")
@@ -27,7 +27,8 @@ def main():
 
     print(f"Looking for: {', '.join(existing_images)}...")
 
-    last_location = None
+    # Dictionary to store the last known location for EACH image
+    last_locations = {}
 
     try:
         while True:
@@ -35,25 +36,31 @@ def main():
                 location = None
                 found_image = None
                 
-                # 1. OPTIMIZATION: Smart Search (Check last known location first)
-                if last_location:
-                    x, y, w, h = last_location
-                    region = (max(0, x - 50), max(0, y - 50), w + 100, h + 100)
-                    try:
-                        for img_name in existing_images:
-                            location = pyautogui.locateOnScreen(img_name, region=region, confidence=0.75, grayscale=False)
+                # 1. OPTIMIZATION: Smart Search (Check last known location for each image first)
+                for img_name in existing_images:
+                    if img_name in last_locations:
+                        x, y, w, h = last_locations[img_name]
+                        # Create a region around the last known location
+                        # Expanded region to be safe
+                        region = (max(0, x - 50), max(0, y - 50), w + 100, h + 100)
+                        try:
+                            # Search only in that region
+                            # Lowered confidence slightly to 0.7 to ensure detection
+                            location = pyautogui.locateOnScreen(img_name, region=region, confidence=0.7, grayscale=False)
                             if location:
                                 found_image = img_name
                                 break
-                    except pyautogui.ImageNotFoundException:
-                        pass 
+                        except pyautogui.ImageNotFoundException:
+                            # If not found in the old spot, remove it from memory so we search full screen next time
+                            del last_locations[img_name]
+                            pass 
                 
-                # 2. Full Screen Search
+                # 2. Full Screen Search (if not found in last location)
                 if not location:
                     for img_name in existing_images:
                         try:
-                            # High confidence + Color matching is crucial to avoid false positives
-                            location = pyautogui.locateOnScreen(img_name, confidence=0.75, grayscale=False)
+                            # Lowered confidence to 0.7 for better detection
+                            location = pyautogui.locateOnScreen(img_name, confidence=0.7, grayscale=False)
                             if location:
                                 found_image = img_name
                                 break
@@ -72,14 +79,16 @@ def main():
                     # Restore mouse position
                     pyautogui.moveTo(current_mouse_x, current_mouse_y)
                     
-                    last_location = location
+                    # Update the last known location for THIS specific image
+                    last_locations[found_image] = location
+                    
                     time.sleep(2) 
                 else:
                     # Button not found. Check for anchor to scroll down.
                     anchor_filename = 'anchor.png'
                     if os.path.exists(anchor_filename):
                         try:
-                            anchor_loc = pyautogui.locateOnScreen(anchor_filename, confidence=0.75, grayscale=False)
+                            anchor_loc = pyautogui.locateOnScreen(anchor_filename, confidence=0.7, grayscale=False)
                             if anchor_loc:
                                 print(f"[{time.strftime('%H:%M:%S')}] Anchor found. Scrolling down...")
                                 # Move mouse below the anchor (header) to ensure we are over the content
